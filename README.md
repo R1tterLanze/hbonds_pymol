@@ -152,13 +152,13 @@ checkFor =			Determines if the clusters of the whole residue should be displayed
 
 
 The initialized Network can be replaced by a new one by usage of the "initiateHBnetwork" command.
-To delete all files of the currently initialized network, the "removeNetwork" command can be used.
+To delete all files of the currently initialized network and close it, the "removeNetwork" command can be used.
 
 
 Limitations
-This program is intended for use with protein structures in the PDB format. Further riboproteins and nucleic acids can be used. It may not work with other types of structures or file formats.
+This program is intended for use with protein and polynucleotide structures in the PDB format. It may not work with other types of structures or file formats.
 
-In addition, the program relies on a set of predefined criteria for identifying hydrogen bonds, which may not be suitable for all protein structures and contexts. As such, the results produced by the program should be interpreted with caution.
+In addition, the program relies on a set of predefined criteria for identifying hydrogen bonds, which may not be suitable for all structures and contexts. As such, the results produced by the program should be interpreted with caution.
 
 License
 This program is provided under the terms of the MIT License. See the LICENSE file for details.

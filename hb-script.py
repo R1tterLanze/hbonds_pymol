@@ -5,7 +5,7 @@
 
 # ### Initialization
 
-# In[81]:
+# In[21]:
 
 
 import pandas as pd
@@ -22,22 +22,22 @@ from shutil import rmtree
 
 # ## PyMOL start up
 
-# In[82]:
+# In[2]:
 
 
 finish_launching()
 
 
-# In[ ]:
+# In[22]:
 
 
 welcome_message =       """Script contains 4 commands:\n
-                        hbsearch: Calculation and displaying hydrogen bonds througout the whole molecule.\n
-                        initiateHBnetwork: Initializing the calculation of hydrogen bonds and ordering connected bonds to networks.\n
-                        showNetwork: Displaying the hydrogen bond network of an atom/residue of choice. Initialization via initiateHBnetwork needed beforehand.\n
-                        removeNetwork: Deleting the cluster files created by the initialization and closing the network.\n \n
-                        For further information and information about the arguments of each command see the ReadME file.
-                        """
+hbsearch: Calculation and displaying hydrogen bonds througout the whole molecule.\n
+initiateHBnetwork: Initializing the calculation of hydrogen bonds and ordering connected bonds to networks.\n
+showNetwork: Displaying the hydrogen bond network of an atom/residue of choice. Initialization via initiateHBnetwork needed beforehand.\n
+removeNetwork: Deleting the cluster files created by the initialization and closing the network.\n \n
+For further information and information about the arguments of each command see the ReadME file.
+"""
 print(welcome_message)
 
 
@@ -45,7 +45,7 @@ print(welcome_message)
 
 # ## Error Classes
 
-# In[83]:
+# In[23]:
 
 
 class DirectoryError(Exception):
@@ -68,7 +68,7 @@ class DirectoryError(Exception):
         
 
 
-# In[84]:
+# In[24]:
 
 
 class SelectionError(Exception):
@@ -91,7 +91,7 @@ class SelectionError(Exception):
         
 
 
-# In[85]:
+# In[25]:
 
 
 class ProcessError(Exception):
@@ -114,7 +114,7 @@ class ProcessError(Exception):
         
 
 
-# In[86]:
+# In[26]:
 
 
 class InputError(Exception):
@@ -137,9 +137,33 @@ class InputError(Exception):
         
 
 
+# ## Establishment of folder structure 
+
+# In[27]:
+
+
+def createFolders():
+    
+    """
+    Creates folders pdb_files and HB_network if not existant.
+    """
+
+    try:
+        if not os.path.exists(os.path.normpath("./pdb_files")):
+            os.mkdir("pdb_files")
+    except:
+        raise DirectoryError("Directory \"pdb_files\" could not be created in script folder. Please try it by hand.")
+        
+    try:
+        if not os.path.exists(os.path.normpath("./HB_network")):
+            os.mkdir("HB_network")
+    except:
+        raise DirectoryError("Directory \"HB_network\" could not be created in script folder. Please try it by hand.")
+
+
 # ## HBsearch
 
-# In[87]:
+# In[28]:
 
 
 def changeDirectory(programDirectory: str = "."):
@@ -152,7 +176,7 @@ def changeDirectory(programDirectory: str = "."):
     
     #Checking if all files/folder for HBsearch and HBnetwork run are present
     #Here: Defining which files are of utmost necessity
-    NEEDED_FOLDERS = ["Darwin", "HB_network", "Linux", "pdb_files", "Windows"]
+    NEEDED_FOLDERS = ["Darwin", "Linux", "Windows"]
     NEEDED_FILES = ["hb-define.txt", "period-table-info.txt"]
        
     path = os.path.normpath(programDirectory) #Path converted suitable to current operating system
@@ -173,7 +197,7 @@ def changeDirectory(programDirectory: str = "."):
     cmd.cd(path)
 
 
-# In[88]:
+# In[29]:
 
 
 def useObject(input_molecule: str):
@@ -195,7 +219,7 @@ def useObject(input_molecule: str):
     cmd.save(os.path.normpath(f"./pdb_files/{input_molecule}.pdb"), input_molecule)
 
 
-# In[89]:
+# In[30]:
 
 
 def removeObject(input_molecule: str):
@@ -215,7 +239,7 @@ def removeObject(input_molecule: str):
     os.remove(os.path.normpath(f"./pdb_files/{input_molecule}.pdb"))
 
 
-# In[90]:
+# In[31]:
 
 
 def fetchPDB(pdbID: str, object_name: str = ""):
@@ -247,7 +271,7 @@ def fetchPDB(pdbID: str, object_name: str = ""):
     cmd.fetch(pdbID, name = object_name, type = "pdb")
 
 
-# In[91]:
+# In[32]:
 
 
 def startHBsearch(molecule: str, hb_file: str, solvent_key:str, pse_file:str, connections: str) -> str:
@@ -291,7 +315,7 @@ def startHBsearch(molecule: str, hb_file: str, solvent_key:str, pse_file:str, co
     return hbs_output
 
 
-# In[92]:
+# In[33]:
 
 
 def readInHBS(hbs_output: str) -> pd.DataFrame():
@@ -318,7 +342,7 @@ def readInHBS(hbs_output: str) -> pd.DataFrame():
     return df
 
 
-# In[93]:
+# In[34]:
 
 
 def prepareLists(dataframe: pd.DataFrame, water_connections: str) -> List:
@@ -386,7 +410,7 @@ def prepareLists(dataframe: pd.DataFrame, water_connections: str) -> List:
     return acceptor, donor
 
 
-# In[94]:
+# In[35]:
 
 
 def displayDistances(acceptor: List, donor: List, object_name: str, run_information:str) -> None:
@@ -422,7 +446,7 @@ def displayDistances(acceptor: List, donor: List, object_name: str, run_informat
     cmd.hide("labels", f"{name_header}_HydrogenBonds")
 
 
-# In[95]:
+# In[36]:
 
 
 def showSticks(acceptor: List, donor: List, object_name: str, run_information: str):
@@ -449,7 +473,7 @@ def showSticks(acceptor: List, donor: List, object_name: str, run_information: s
     cmd.deselect() #Selection is deselected for better clarity and to spare the user deselecting selection by him-/herself.
 
 
-# In[96]:
+# In[37]:
 
 
 def hbsearch(molecule:str, molecule_name: str = "", directory:str = ".", 
@@ -492,6 +516,9 @@ def hbsearch(molecule:str, molecule_name: str = "", directory:str = ".",
     
     changeDirectory(directory) #Change directory to program folder directory. Needed PyMol directory is not set to program folder for HBsearch run
     
+    #Create folder structure if necessairy
+    createFolders()
+    
     #Checks if user wants to use own object in PyMol session or wants to fetch a protein structure from the PDB
     if use_object == "0": #User wants to fetch a protein from the PDB using a PDB-ID
         fetchPDB(molecule, molecule_name) #Uses fetch command to fetch PDB_ID and allows user to name the fetched object in PyMol session.
@@ -522,7 +549,7 @@ def hbsearch(molecule:str, molecule_name: str = "", directory:str = ".",
 
 
 
-# In[97]:
+# In[38]:
 
 
 #Creation of command in PyMol.
@@ -531,7 +558,7 @@ cmd.extend("hbsearch", hbsearch) #When read in in PyMol the script creates a com
 
 # # HB-Network - Initialization
 
-# In[98]:
+# In[39]:
 
 
 class saveBot:
@@ -546,7 +573,7 @@ save = saveBot()
 save.initiation_done = 0
 
 
-# In[99]:
+# In[40]:
 
 
 def createDirectory(molecule_name:str) -> str:
@@ -572,7 +599,7 @@ def createDirectory(molecule_name:str) -> str:
     return directory_name
 
 
-# In[100]:
+# In[41]:
 
 
 def createHBnetwork(molecule: str, directory_name: str, hb_file: str = "hb-define.txt", 
@@ -614,7 +641,7 @@ def createHBnetwork(molecule: str, directory_name: str, hb_file: str = "hb-defin
     return hbn_output
 
 
-# In[101]:
+# In[42]:
 
 
 def cleanHBnetwork(directory_name: str):
@@ -640,7 +667,7 @@ def cleanHBnetwork(directory_name: str):
     
 
 
-# In[102]:
+# In[43]:
 
 
 def indexHbnetwork(hbn_output: str):
@@ -695,7 +722,7 @@ def indexHbnetwork(hbn_output: str):
     return cluster_dict
 
 
-# In[103]:
+# In[44]:
 
 
 def initiateHBnetwork(molecule:str, molecule_name = "", directory:str = ".", water_connections: str = "0", 
@@ -741,6 +768,9 @@ def initiateHBnetwork(molecule:str, molecule_name = "", directory:str = ".", wat
     
     changeDirectory(directory) #Change directory to program folder directory. Needed PyMol directory is not set to program folder for HBnetwork run
     
+    #Create necessairy folder structures
+    createFolders()
+    
     #Checks if user wants to use own object in PyMol session or wants to fetch a protein structure from the PDB
     if use_object == "0": #User wants to fetch a protein from the PDB using a PDB-ID
         fetchPDB(molecule, molecule_name) #Uses fetch command to fetch PDB_ID and allows user to name the fetched object in PyMol session.
@@ -784,7 +814,7 @@ def initiateHBnetwork(molecule:str, molecule_name = "", directory:str = ".", wat
 
 
 
-# In[104]:
+# In[45]:
 
 
 #Creates a pymol command starting initiateHBnetwork().
@@ -793,7 +823,7 @@ cmd.extend("initiateHBnetwork", initiateHBnetwork)
 
 # # HB-Network PyMol-Display
 
-# In[105]:
+# In[46]:
 
 
 def readoutHBnetwork(query: str, checkFor: str = "RESIDUE" ) -> str:
@@ -841,7 +871,7 @@ def readoutHBnetwork(query: str, checkFor: str = "RESIDUE" ) -> str:
     return destination_cluster_list #Cluster list is passed to next function for searching respective cluster files.
 
 
-# In[106]:
+# In[47]:
 
 
 def readInHBN(cluster_file_output: str) -> pd.DataFrame:
@@ -865,7 +895,7 @@ def readInHBN(cluster_file_output: str) -> pd.DataFrame:
     return df_cluster
 
 
-# In[107]:
+# In[48]:
 
 
 def prepareDataFrameHBnetwork(destination_cluster_list: str) -> pd.DataFrame:
@@ -911,7 +941,7 @@ def prepareDataFrameHBnetwork(destination_cluster_list: str) -> pd.DataFrame:
     return hBond_cluster_dataframe
 
 
-# In[113]:
+# In[49]:
 
 
 def showNetwork(query: str, checkFor = "RESIDUE") -> None:
@@ -943,8 +973,8 @@ def showNetwork(query: str, checkFor = "RESIDUE") -> None:
 
         #Prepares acceptor/donor lists using the dataframe.
         if hbn_dataframe.empty: #Check if dataframe is empty. In case it is empty --> Stop function. Show notification.
-            print(f"This {checkFor} {query} does not participate in any hydrogen bonds")
-            return None
+            print(f"This {checkFor} {query_entry} does not participate in any hydrogen bonds")
+            continue
 
         else:
             water_connections = save.water_connections_save
@@ -968,14 +998,14 @@ def showNetwork(query: str, checkFor = "RESIDUE") -> None:
 
 
 
-# In[109]:
+# In[50]:
 
 
 #Creates PyMol command for showNetwork().
 cmd.extend("showNetwork", showNetwork)
 
 
-# In[110]:
+# In[51]:
 
 
 """<!--       _
@@ -984,7 +1014,7 @@ cmd.extend("showNetwork", showNetwork)
  ~~~~~~~~~~~~~~~~~~-->"""
 
 
-# In[111]:
+# In[52]:
 
 
 def removeNetwork():
@@ -1008,7 +1038,7 @@ def removeNetwork():
     print("Network files were removed successfully")
 
 
-# In[112]:
+# In[53]:
 
 
 cmd.extend("removeNetwork", removeNetwork)
